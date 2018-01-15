@@ -12,12 +12,13 @@ client.search({
       "query": {
         "query_string" : {
             "default_field" : "o",
-            "query" : "1Q5XnSVEG7qv3idq8LhFYwmSaSgzwDYH49"
+            "query" : "1LpwgrJfkPjVL429L3PKGQ7E9PcyFp7EuW"
         }
     }
   }
 }).then(function (resp) {
-    var hits = resp.hits.hits;
+    var hits = resp.hits.total;
+    console.log(hits)
 }, function (err) {
     console.trace(err.message);
 });

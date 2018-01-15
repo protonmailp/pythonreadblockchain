@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 from requests.auth import HTTPBasicAuth
 from elasticsearch5 import Elasticsearch
 from elasticsearch5 import helpers
@@ -7,30 +8,33 @@ from elasticsearch5 import helpers
 es = Elasticsearch()
 blockhashs=[]
 txids=[]
-def getblockhash(height):
+def getblockhash(height,step):
     url = "http://127.0.0.1:8332"
-    commands = [{"method":"getblockhash","params":[h],"id":"jsonrpc" } for h in range(height, height + 500)]
+    commands = [{"method":"getblockhash","params":[h],"id":"jsonrpc" } for h in range(height, height + step)]
     r = requests.post(url, data=json.dumps(commands), auth=("admin", "admin"), headers={'content-type': "application/json"})
     jblockhash =json.loads(r.content.decode("utf-8"))
  #   print(jblockhash)
     for jb in jblockhash:
         blockhashs.append(jb["result"])
+ #       print(jb['result'])
  #   print(blockhashs)
 
 
-def getblock(height):
+def getblock(height,step):
     url = "http://127.0.0.1:8332"
 
 
-    blockhashs1=blockhashs[height:(height + 500)]
+    blockhashs1=blockhashs[height:(height + step)]
     commands = [{"method": "getblock", "params": [blockhash], "id": "jsonrpc"} for blockhash in blockhashs1]
 
     r = requests.post(url, data=json.dumps(commands), auth=("admin", "admin"), headers={'content-type': "application/json"})
     jblock =json.loads(r.content.decode("utf-8"))
     for block in jblock:
         txs =block['result']['tx']
+#        print(txs)
         for tx in txs:
             txids.append(tx)
+
 
 def getrawtransaction():
     url = "http://127.0.0.1:8332"
@@ -120,18 +124,74 @@ def getrawtransaction():
         print(str(j))
 
 
+def gettotalblocks():
+    url = "http://127.0.0.1:8332"
+    command ={"method":"getinfo","params":[],"id":"jsonrpc"}
+    r = requests.post(url, data=json.dumps(command), auth=("admin", "admin"), headers={'content-type': "application/json"})
+    jinfo =json.loads(r.content.decode("utf-8"))
+    return jinfo['result']["blocks"]
 
 
+totalblocks =0
+totalblocks =gettotalblocks()
 
+print(totalblocks)
 
+for i in range(1,totalblocks,1000):
+    if totalblocks-i>=1000 :
+        getblockhash(i,1000)
+    elif totalblocks-i<1000 and totalblocks-i>0:
+        getblockhash(i,totalblocks-i)
+    else:
+        pass
 
-
-
-
-for i in range(1,502500,500): #1,500000
-    print("getblockhash")
+for i in range(502000,totalblocks,1000):
     print(i)
-    getblockhash(i)
+
+    if totalblocks-i>=1000:
+        getblock(i,1000)
+    elif totalblocks-i<1000 and totalblocks-i>0:
+        getblock(i,totalblocks-i)
+    else:
+        pass
+
+getrawtransaction()
+newtotalblocks=0
+
+while True:
+    time.sleep(60)
+    txids = []
+    newtotalblocks = gettotalblocks()
+    print(totalblocks)
+    print(newtotalblocks)
+    for i in range(totalblocks,newtotalblocks,1000):
+        if newtotalblocks-i>=1000 :
+            getblockhash(i,1000)
+        elif newtotalblocks-i<1000 and newtotalblocks-i>0:
+            getblockhash(i,newtotalblocks-i)
+        else:
+            pass
+
+    for i in range(totalblocks,newtotalblocks,1000):
+        if newtotalblocks-i>=1000 :
+            getblock(i,1000)
+        elif newtotalblocks-i<1000 and newtotalblocks-i>0:
+            getblock(i,newtotalblocks-i)
+        else:
+            pass
+
+    getrawtransaction()
+    totalblocks=newtotalblocks
+    print("while ok")
+
+
+
+
+
+# for i in range(1,502500,500): #1,500000
+#     print("getblockhash")
+#     print(i)
+#     getblockhash(i)
 # for i in range(299001,400000,500):  # 1 200000 , 1900000 300000 , 299001 400000,
 #     print("getblock 1")
 #     print(i)
@@ -150,14 +210,14 @@ for i in range(1,502500,500): #1,500000
 # getrawtransaction()
 
 
-txids =[]
-for i in range(459501,502500,500):  # 1 200000 , 1900000 300000 , 299001 400000,
-    print("getblock 3")
-    print(i)
-    getblock(i)
-
-print(len(txids))
-getrawtransaction()
+# txids =[]
+# for i in range(459501,502500,500):  # 1 200000 , 1900000 300000 , 299001 400000,
+#     print("getblock 3")
+#     print(i)
+#     getblock(i)
+#
+# print(len(txids))
+# getrawtransaction()
 
 
 

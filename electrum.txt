@@ -1,0 +1,37 @@
+electrum setconfig rpcpassword 'adminadmin'
+electrum setconfig rpcuser 'adminadmin'
+
+electrum setconfig rpcport 7777
+
+electrum daemon start
+electrum daemon stop
+
+
+https://electrum-ltc.org/
+electrum-ltc
+
+
+{'tx_hash': 'e73a8ac4255a0ddaa475ab52219b4c5cb0b4f0fe30d7add6e193d6394c55db73', 'value': 500000000, 'height': 1349238, 'tx_pos': 2}
+
+https://electroncash.org/
+
+sudo apt-get install python3-setuptools python3-pyqt5 python3-pip python3-dev libssl-dev
+sudo pip3 install https://electroncash.org/downloads/3.1.2/win-linux/ElectronCash-3.1.2.tar.gz
+
+electron-cash setconfig rpcpassword 'adminadmin'
+electron-cash setconfig rpcuser 'adminadmin'
+
+electron-cash setconfig rpcport 7777
+
+
+ub zhan yong le electrum yuanban de electrum
+
+
+
+
+url = "http://127.0.0.1:7777"
+command = {"id":0,"method":"getaddressunspent","params":[""]}
+r = requests.post(url, data=json.dumps(command),auth=("adminadmin","adminadmin"))
+jcontent=json.loads(r.content.decode("utf-8"))
+print(jcontent['result'])
+print(len(jcontent['result']))
